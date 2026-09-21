@@ -97,6 +97,29 @@ app.delete('/assignments/:id', async (req, res) => {
   }
 });
 
+app.get('/assignments', async (req, res) => {
+  try {
+    const { submitted } = req.query;
+
+    if (submitted === 'true') {
+      const result = await pool.query(
+        `SELECT * FROM assignments
+        WHERE submitted = $1`,
+        [true]
+      );
+
+      return res.json(result.rows);
+    }
+
+    const result = await pool.query('SELECT * FROM assignments');
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error querying database:', err);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
 });
